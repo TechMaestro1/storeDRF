@@ -1,0 +1,35 @@
+language: python
+
+services:
+  - postgresql
+
+python:
+  - "3.4"
+  - "2.7"
+
+env:
+  - DJANGO="django==1.8.2"
+  - DJANGO="django==1.7.7"
+  - DJANGO="django==1.6.11"
+
+branches:
+  only:
+    - master
+
+# command to install requirements
+install:
+  - pip install $DJANGO
+  - pip install -r requirements.txt
+  - pip install coverage coveralls
+  - python setup.py -q develop
+
+before_script:
+  - psql template1 -c 'create extension hstore;'
+  - createdb drf_hstore
+
+# command to run tests, e.g. python setup.py test
+script:
+  - coverage run --source rest_framework_hstore runtests.py
+
+after_success:
+  coveralls
